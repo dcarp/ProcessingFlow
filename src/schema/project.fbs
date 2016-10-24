@@ -1,0 +1,41 @@
+namespace ProcessingFlow;
+
+table Any {
+    type_url: string (key);
+    value: [ubyte];
+}
+
+table Node {
+    name: string (key);
+    type_url: string;
+    input_type_url: string;
+    parameters_type_url: string;
+    output_type_url: string;
+}
+
+table Edge {
+    start_node: string;
+    end_node: string;
+}
+
+table ParameterValue {
+    node_name: string;
+    value: Any;
+}
+
+table Recipe {
+    name: string;
+    nodes: [Node];
+    edges: [Edge];
+    parameter_values: [ParameterValue];
+}
+
+table Project {
+    name: string;
+    recipes: [Recipe];
+}
+
+root_type Project;
+
+file_identifier "TPFP";
+file_extension "pfp";

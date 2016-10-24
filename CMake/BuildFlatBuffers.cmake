@@ -87,7 +87,6 @@ function(build_flatbuffers flatbuffers_schemas
   endforeach()
 
   foreach(schema ${flatbuffers_schemas})
-    message(la ${schema})
     get_filename_component(filename ${schema} NAME_WE)
     # For each schema, do the things we requested.
     if (NOT ${generated_includes_dir} STREQUAL "")

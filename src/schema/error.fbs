@@ -1,0 +1,10 @@
+namespace ProcessingFlow;
+
+table Error {
+    message: string;
+    file: string;
+    line: uint;
+    function: string;
+}
+
+root_type Error;
