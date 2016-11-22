@@ -4,6 +4,10 @@ compiler:
   - clang
   - gcc
 
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -qq libgtest-dev libopencv-dev
+
 script:
   - mkdir build
   - cd build
