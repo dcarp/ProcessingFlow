@@ -12,14 +12,15 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 
+find_package(FlatBuffers REQUIRED)
 find_package(OpenCV REQUIRED)
-
-enable_testing()
 
 include_directories(
     include
     ${CMAKE_BINARY_DIR}/include
     ${FLATBUFFERS_INCLUDE_DIR})
+
+enable_testing()
 
 add_subdirectory(src)
 add_subdirectory(test)

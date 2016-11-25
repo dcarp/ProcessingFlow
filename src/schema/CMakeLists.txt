@@ -1,5 +1,3 @@
-find_package(FlatBuffers REQUIRED)
-
 set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS --gen-name-strings --gen-object-api)
 
 set(FLATBUFFERS_SCHEMAS
