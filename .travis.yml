@@ -1,3 +1,5 @@
+dist: trusty
+sudo: required
 language: cpp
 
 compiler:
@@ -5,10 +7,36 @@ compiler:
   - gcc
 
 before_install:
-- sudo apt-get update -qq
-- sudo apt-get install -qq libgtest-dev libopencv-dev
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libc++-dev libc++abi-dev libopencv-dev libtbb-dev
+  - mkdir build
+  - pushd build
+
+  - git clone https://github.com/google/googletest.git
+  - pushd googletest
+  - git checkout release-1.8.0
+  - mkdir -p build/export
+  - pushd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=export && make && make install
+  - popd
+  - popd
+
+  - git clone https://github.com/google/flatbuffers.git
+  - pushd flatbuffers
+  - git checkout v1.4.0
+  - mkdir -p build/export
+  - pushd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=export && make && make install
+  - popd
+  - popd
+
+  - curl -fsSL https://www.threadingbuildingblocks.org/sites/default/files/software_releases/source/tbb2017_20161004oss_src.tgz | tar -C . -zxf -
+  - pushd tbb2017_20161004oss
+  - make
+  - popd
+
+  - popd
 
 script:
-  - mkdir build
   - cd build
-  - cmake .. && make
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=`pwd`/googletest/build/export -DCMAKE_PREFIX_PATH=`pwd`/flatbuffers/build/export -DCMAKE_CXX_FLAGS="-std=c++11 -I`pwd`/tbb2017_20161004oss/include" && make && make test
