@@ -98,9 +98,10 @@ public:
                              ProcessingBody<Body>(body, *this)),
           name_(name)
     {
-        static_assert(std::is_same<std::result_of_t<Body(Input, Parameters)>,
-                                   Output>::value,
-                      "Processing node type and body definition missmatch");
+        static_assert(
+            std::is_same<typename std::result_of<Body(Input, Parameters)>::type,
+                         Output>::value,
+            "Processing node type and body definition missmatch");
 
         tbb::flow::make_edge(multiplexer, processingFunction);
 
