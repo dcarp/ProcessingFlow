@@ -30,8 +30,9 @@ before_install:
   - popd
   - popd
 
-  - curl -fsSL https://www.threadingbuildingblocks.org/sites/default/files/software_releases/source/tbb2017_20161004oss_src.tgz | tar -C . -zxf -
-  - pushd tbb2017_20161004oss
+  - git clone https://github.com/01org/tbb.git
+  - pushd tbb
+  - git checkout 2017_U3
   - make
   - popd
 
@@ -39,4 +40,4 @@ before_install:
 
 script:
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=`pwd`/googletest/build/export -DCMAKE_PREFIX_PATH=`pwd`/flatbuffers/build/export -DCMAKE_CXX_FLAGS="-std=c++11 -I`pwd`/tbb2017_20161004oss/include" && make && make test
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=`pwd`/googletest/build/export -DCMAKE_PREFIX_PATH=`pwd`/flatbuffers/build/export -DCMAKE_CXX_FLAGS="-std=c++11 -I`pwd`/tbb/include" && make && make test
