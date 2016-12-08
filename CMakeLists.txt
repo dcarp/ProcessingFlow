@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     add_definitions(-DTBB_USE_GLIBCXX_VERSION=60201)
-#     add_definitions(-stdlib=libc++)
+    add_definitions(-stdlib=libc++)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
