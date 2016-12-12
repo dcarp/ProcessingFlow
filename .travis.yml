@@ -46,11 +46,11 @@ before_install:
   - git clone https://github.com/01org/tbb.git
   - pushd tbb
   - git checkout 2017_U3
-  - make
+  - make tbb_build_prefix=export
   - popd
 
   - popd
 
 script:
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=`pwd`/googletest/build/export -DCMAKE_PREFIX_PATH=`pwd`/flatbuffers/build/export -DCMAKE_CXX_FLAGS="-std=c++11 -I`pwd`/tbb/include" && make && make test
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DGTEST_ROOT=`pwd`/googletest/build/export -DCMAKE_PREFIX_PATH=`pwd`/flatbuffers/build/export -DCMAKE_CXX_FLAGS="-std=c++11 -I`pwd`/tbb/include" -DCMAKE_EXE_LINKER_FLAGS="-L`pwd`/tbb/build/export_release" -DSHOW_EVERY_TEST=ON && make && LD_LIBRARY_PATH=`pwd`/tbb/build/export_release make test
