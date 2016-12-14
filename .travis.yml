@@ -6,10 +6,6 @@ matrix:
       dist: trusty
       sudo: required
       compiler: gcc
-      addons:
-        apt:
-          packages:
-            - libopencv-dev
     - os: linux
       dist: trusty
       sudo: required
@@ -19,7 +15,6 @@ matrix:
           packages:
             - libc++-dev
             - libc++abi-dev
-            - libopencv-dev
 
 before_install:
   - mkdir build

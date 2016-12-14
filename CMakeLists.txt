@@ -13,7 +13,6 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
 
 find_package(FlatBuffers REQUIRED)
-find_package(OpenCV REQUIRED)
 
 include_directories(
     include

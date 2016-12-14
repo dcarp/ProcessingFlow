@@ -1,9 +1,0 @@
-namespace ProcessingFlow;
-
-table OpenCVMat {
-    dimensions: [int];
-    type: int;
-    data: [ubyte];
-}
-
-root_type OpenCVMat;

@@ -2,7 +2,6 @@ set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS --gen-name-strings --gen-object-api)
 
 set(FLATBUFFERS_SCHEMAS
     error.fbs
-    opencv.fbs
     project.fbs)
 
 set(PREFIXED_FLATBUFFERS_SCHEMAS "")
