@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dcarp/ProcessingFlow.png?branch=master)](https://travis-ci.org/dcarp/ProcessingFlow)
+
 # ProcessingFlow
 
 **ProcessingFlow** is a library for defining data processing flows usable

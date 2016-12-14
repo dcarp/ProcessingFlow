@@ -6,15 +6,15 @@ matrix:
       dist: trusty
       sudo: required
       compiler: gcc
-    - os: linux
-      dist: trusty
-      sudo: required
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - libc++-dev
-            - libc++abi-dev
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   compiler: clang
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - libc++-dev
+    #         - libc++abi-dev
 
 before_install:
   - mkdir build
