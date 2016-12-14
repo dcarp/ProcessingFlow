@@ -15,6 +15,17 @@ namespace ProcessingFlow
 class TwoTrackNode
 {
 public:
+    enum Inputs {
+        dataInputPort,
+        parametersInputPort,
+        errorInputPort,
+    };
+
+    enum Outputs {
+        dataOutputPort,
+        parametersOutputPort,
+        errorOutputPort,
+    };
 };
 
 template <FlowDataType Input, ParameterType Parameters,
@@ -29,16 +40,16 @@ class ProcessingNode
                                     std::tuple<Output, Parameters, ErrorT>>;
     using Multiplexer = tbb::flow::indexer_node<Input, ErrorT>;
     enum {
-        MULTIPLEXER_INPUT_PORT = 0,
-        MULTIPLEXER_ERROR_PORT = 1,
+        multiplexerInputPort = 0,
+        multiplexerErrorPort = 1,
     };
 
     using ProcessingFunction
         = tbb::flow::multifunction_node<typename Multiplexer::output_type,
                                         std::tuple<Output, ErrorT>>;
     enum {
-        PROCESSING_FUNCTION_OUTPUT_PORT = 0,
-        PROCESSING_FUNCTION_ERROR_PORT = 1,
+        processingFunctionOutputPort = 0,
+        processingFunctionErrorPort = 1,
     };
 
     tbb::flow::overwrite_node<Parameters> parameters;
@@ -58,9 +69,9 @@ class ProcessingNode
                         typename ProcessingFunction::output_ports_type &output)
         {
             switch (input.tag()) {
-            case MULTIPLEXER_INPUT_PORT:
+            case multiplexerInputPort:
                 if (!outer_.parameters.is_valid()) {
-                    std::get<PROCESSING_FUNCTION_ERROR_PORT>(output).try_put(
+                    std::get<processingFunctionErrorPort>(output).try_put(
                         MAKE_ERROR("No processing parameters"));
                     return;
                 }
@@ -69,16 +80,16 @@ class ProcessingNode
                     Parameters parameters;
                     outer_.parameters.try_get(parameters);
 
-                    std::get<PROCESSING_FUNCTION_OUTPUT_PORT>(output).try_put(
+                    std::get<processingFunctionOutputPort>(output).try_put(
                         body_(tbb::flow::cast_to<Input>(input), parameters));
                 } catch (const std::exception &exception) {
-                    std::get<PROCESSING_FUNCTION_ERROR_PORT>(output).try_put(
+                    std::get<processingFunctionErrorPort>(output).try_put(
                         MAKE_ERROR(exception.what()));
                 }
 
                 break;
-            case MULTIPLEXER_ERROR_PORT:
-                std::get<PROCESSING_FUNCTION_ERROR_PORT>(output).try_put(
+            case multiplexerErrorPort:
+                std::get<processingFunctionErrorPort>(output).try_put(
                     tbb::flow::cast_to<ErrorT>(input));
                 break;
             }
@@ -106,13 +117,13 @@ public:
         tbb::flow::make_edge(multiplexer, processingFunction);
 
         typename Base::input_ports_type input_tuple(
-            tbb::flow::input_port<MULTIPLEXER_INPUT_PORT>(multiplexer),
+            tbb::flow::input_port<multiplexerInputPort>(multiplexer),
             parameters,
-            tbb::flow::input_port<MULTIPLEXER_ERROR_PORT>(multiplexer));
+            tbb::flow::input_port<multiplexerErrorPort>(multiplexer));
         typename Base::output_ports_type output_tuple(
-            tbb::flow::output_port<PROCESSING_FUNCTION_OUTPUT_PORT>(
+            tbb::flow::output_port<processingFunctionOutputPort>(
                 processingFunction),
-            parameters, tbb::flow::output_port<PROCESSING_FUNCTION_ERROR_PORT>(
+            parameters, tbb::flow::output_port<processingFunctionErrorPort>(
                             processingFunction));
         Base::set_external_ports(input_tuple, output_tuple);
     }

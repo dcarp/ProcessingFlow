@@ -28,9 +28,13 @@ public:
               errors.push_back(error);
           })
     {
-        make_edge(output_port<0>(processingNode), outputCollector);
-        make_edge(output_port<1>(processingNode), parametersCollector);
-        make_edge(output_port<2>(processingNode), errorCollector);
+        make_edge(output_port<TwoTrackNode::dataInputPort>(processingNode),
+                  outputCollector);
+        make_edge(
+            output_port<TwoTrackNode::parametersInputPort>(processingNode),
+            parametersCollector);
+        make_edge(output_port<TwoTrackNode::errorInputPort>(processingNode),
+                  errorCollector);
     }
 
 protected:

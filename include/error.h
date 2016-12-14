@@ -11,7 +11,7 @@ namespace ProcessingFlow
 ErrorT makeError(const std::string &file, unsigned line,
                  const std::string &function, const std::string &message)
 {
-    ErrorT error;
+    ErrorT error = {};
     error.file = file;
     error.line = line;
     error.function = function;

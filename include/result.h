@@ -1,6 +1,7 @@
 #ifndef _PROCESSING_FLOW_RESULT_H_
 #define _PROCESSING_FLOW_RESULT_H_
 
+#include <cassert>
 #include <exception>
 #include <utility>
 
