@@ -1,0 +1,8 @@
+namespace ProcessingFlow.FlatBuffers;
+
+table Any {
+    type_url: string (key);
+    value: [ubyte];
+}
+
+root_type Any;

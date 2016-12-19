@@ -1,4 +1,4 @@
-namespace ProcessingFlow;
+namespace ProcessingFlow.FlatBuffers;
 
 table Error {
     message: string;

@@ -1,9 +1,6 @@
-namespace ProcessingFlow;
+include "any.fbs";
 
-table Any {
-    type_url: string (key);
-    value: [ubyte];
-}
+namespace ProcessingFlow.FlatBuffers;
 
 table Node {
     name: string (key);

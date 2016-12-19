@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include "processing_node.h"
@@ -13,7 +15,7 @@ public:
     using Outputs = std::vector<Output>;
     using Parameters = int;
     using ParameterSets = std::vector<Parameters>;
-    using Errors = std::vector<ErrorT>;
+    using Errors = std::vector<Error>;
 
     ProcessingNodeTest()
         : processingNode(graph, [](Output f, Parameters i) { return i * f; }),
@@ -24,17 +26,14 @@ public:
                               [this](const Parameters &parameters) {
                                   parameterSets.push_back(parameters);
                               }),
-          errorCollector(graph, serial, [this](const ErrorT &error) {
+          errorCollector(graph, serial, [this](const Error &error) {
               errors.push_back(error);
           })
     {
-        make_edge(output_port<TwoTrackNode::dataInputPort>(processingNode),
-                  outputCollector);
-        make_edge(
-            output_port<TwoTrackNode::parametersInputPort>(processingNode),
-            parametersCollector);
-        make_edge(output_port<TwoTrackNode::errorInputPort>(processingNode),
-                  errorCollector);
+        make_edge(output_port<dataInputPort>(processingNode), outputCollector);
+        make_edge(output_port<parametersInputPort>(processingNode),
+                  parametersCollector);
+        make_edge(output_port<errorInputPort>(processingNode), errorCollector);
     }
 
 protected:
@@ -48,7 +47,7 @@ protected:
 private:
     function_node<Output> outputCollector;
     function_node<Parameters> parametersCollector;
-    function_node<ErrorT> errorCollector;
+    function_node<Error> errorCollector;
 };
 
 TEST_F(ProcessingNodeTest, CreatesInstanceWithParameters)

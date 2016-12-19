@@ -6,12 +6,14 @@
 namespace ProcessingFlow
 {
 
+using Error = FlatBuffers::ErrorT;
+
 #define MAKE_ERROR(message) makeError(__FILE__, __LINE__, __FUNCTION__, message)
 
-ErrorT makeError(const std::string &file, unsigned line,
-                 const std::string &function, const std::string &message)
+Error makeError(const std::string &file, unsigned line,
+                const std::string &function, const std::string &message)
 {
-    ErrorT error = {};
+    Error error = {};
     error.file = file;
     error.line = line;
     error.function = function;
@@ -20,10 +22,15 @@ ErrorT makeError(const std::string &file, unsigned line,
     return error;
 }
 
+namespace FlatBuffers
+{
+
 bool operator==(const ErrorT &firstError, const ErrorT &secondError)
 {
     return firstError.message == secondError.message;
 }
+
+} // namespace FlatBuffers
 
 } // namespace ProcessingFlow
 

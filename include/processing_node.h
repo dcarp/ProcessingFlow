@@ -12,33 +12,33 @@ namespace ProcessingFlow
 #define ParameterType typename
 #define BodyType typename
 
+enum InputPortIds {
+    dataInputPort,
+    parametersInputPort,
+    errorInputPort,
+};
+
+enum OutputPortIds {
+    dataOutputPort,
+    parametersOutputPort,
+    errorOutputPort,
+};
+
 class TwoTrackNode
 {
-public:
-    enum Inputs {
-        dataInputPort,
-        parametersInputPort,
-        errorInputPort,
-    };
-
-    enum Outputs {
-        dataOutputPort,
-        parametersOutputPort,
-        errorOutputPort,
-    };
 };
 
 template <FlowDataType Input, ParameterType Parameters,
           FlowDataType Output = Input>
 class ProcessingNode
-    : public tbb::flow::composite_node<std::tuple<Input, Parameters, ErrorT>,
-                                       std::tuple<Output, Parameters, ErrorT>>,
+    : public tbb::flow::composite_node<std::tuple<Input, Parameters, Error>,
+                                       std::tuple<Output, Parameters, Error>>,
       public TwoTrackNode
 {
     using Base
-        = tbb::flow::composite_node<std::tuple<Input, Parameters, ErrorT>,
-                                    std::tuple<Output, Parameters, ErrorT>>;
-    using Multiplexer = tbb::flow::indexer_node<Input, ErrorT>;
+        = tbb::flow::composite_node<std::tuple<Input, Parameters, Error>,
+                                    std::tuple<Output, Parameters, Error>>;
+    using Multiplexer = tbb::flow::indexer_node<Input, Error>;
     enum {
         multiplexerInputPort = 0,
         multiplexerErrorPort = 1,
@@ -46,7 +46,7 @@ class ProcessingNode
 
     using ProcessingFunction
         = tbb::flow::multifunction_node<typename Multiplexer::output_type,
-                                        std::tuple<Output, ErrorT>>;
+                                        std::tuple<Output, Error>>;
     enum {
         processingFunctionOutputPort = 0,
         processingFunctionErrorPort = 1,
@@ -90,7 +90,7 @@ class ProcessingNode
                 break;
             case multiplexerErrorPort:
                 std::get<processingFunctionErrorPort>(output).try_put(
-                    tbb::flow::cast_to<ErrorT>(input));
+                    tbb::flow::cast_to<Error>(input));
                 break;
             }
         }
