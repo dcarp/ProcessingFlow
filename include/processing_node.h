@@ -5,6 +5,8 @@
 
 #include "error.h"
 
+#include "node_generated.h"
+
 namespace ProcessingFlow
 {
 
@@ -56,7 +58,7 @@ class ProcessingNode
     Multiplexer multiplexer;
     ProcessingFunction processingFunction;
 
-    const std::string name_;
+    FlatBuffers::NodeT definition;
 
     template <BodyType Body> struct ProcessingBody {
         ProcessingBody(Body &body, ProcessingNode &outer)
@@ -107,12 +109,14 @@ public:
         : Base(graph), parameters(graph), multiplexer(graph),
           processingFunction(graph, tbb::flow::serial,
                              ProcessingBody<Body>(body, *this)),
-          name_(name)
+          definition()
     {
         static_assert(
             std::is_same<typename std::result_of<Body(Input, Parameters)>::type,
                          Output>::value,
             "Processing node type and body definition missmatch");
+
+        definition.name = name;
 
         tbb::flow::make_edge(multiplexer, processingFunction);
 

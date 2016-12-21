@@ -1,14 +1,7 @@
 include "any.fbs";
+include "node.fbs";
 
 namespace ProcessingFlow.FlatBuffers;
-
-table Node {
-    name: string (key);
-    type_url: string;
-    input_type_url: string;
-    parameters_type_url: string;
-    output_type_url: string;
-}
 
 table Edge {
     start_node: string;
