@@ -15,13 +15,13 @@ namespace ProcessingFlow
 #define BodyType typename
 
 enum InputPortIds {
-    dataInputPort,
+    flowInputPort,
     parametersInputPort,
     errorInputPort,
 };
 
 enum OutputPortIds {
-    dataOutputPort,
+    flowOutputPort,
     parametersOutputPort,
     errorOutputPort,
 };
@@ -30,12 +30,22 @@ class TwoTrackNode
 {
 };
 
+template <FlowDataType FlowData> class FlowReceiver
+{
+};
+
+template <FlowDataType FlowData> class FlowSender
+{
+};
+
 template <FlowDataType Input, ParameterType Parameters,
           FlowDataType Output = Input>
 class ProcessingNode
     : public tbb::flow::composite_node<std::tuple<Input, Parameters, Error>,
                                        std::tuple<Output, Parameters, Error>>,
-      public TwoTrackNode
+      public TwoTrackNode,
+      public FlowReceiver<Input>,
+      public FlowSender<Output>
 {
     using Base
         = tbb::flow::composite_node<std::tuple<Input, Parameters, Error>,
@@ -131,6 +141,10 @@ public:
                             processingFunction));
         Base::set_external_ports(input_tuple, output_tuple);
     }
+
+    virtual ~ProcessingNode() {}
+
+    std::string name() const { return definition.name; }
 };
 
 } // namespace ProcessingFlow

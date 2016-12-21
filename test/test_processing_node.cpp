@@ -11,14 +11,15 @@ using namespace ProcessingFlow;
 class ProcessingNodeTest : public ::testing::Test
 {
 public:
-    using Output = float;
+    using Input = float;
+    using Output = Input;
     using Outputs = std::vector<Output>;
     using Parameters = int;
     using ParameterSets = std::vector<Parameters>;
     using Errors = std::vector<Error>;
 
     ProcessingNodeTest()
-        : processingNode(graph, [](Output f, Parameters i) { return i * f; }),
+        : processingNode(graph, [](Input f, Parameters i) { return i * f; }),
           outputCollector(
               graph, serial,
               [this](const Output &output) { outputs.push_back(output); }),
@@ -30,10 +31,10 @@ public:
               errors.push_back(error);
           })
     {
-        make_edge(output_port<dataInputPort>(processingNode), outputCollector);
-        make_edge(output_port<parametersInputPort>(processingNode),
+        make_edge(output_port<flowOutputPort>(processingNode), outputCollector);
+        make_edge(output_port<parametersOutputPort>(processingNode),
                   parametersCollector);
-        make_edge(output_port<errorInputPort>(processingNode), errorCollector);
+        make_edge(output_port<errorOutputPort>(processingNode), errorCollector);
     }
 
 protected:
@@ -42,7 +43,7 @@ protected:
     Errors errors;
 
     tbb::flow::graph graph;
-    ProcessingNode<Output, Parameters> processingNode;
+    ProcessingNode<Input, Parameters> processingNode;
 
 private:
     function_node<Output> outputCollector;
@@ -54,6 +55,7 @@ TEST_F(ProcessingNodeTest, CreatesInstanceWithParameters)
 {
     graph.wait_for_all();
 
+    EXPECT_EQ(processingNode.name(), "");
     EXPECT_EQ(Outputs(), outputs);
     EXPECT_EQ(ParameterSets(), parameterSets);
     EXPECT_EQ(Errors(), errors);
@@ -61,8 +63,8 @@ TEST_F(ProcessingNodeTest, CreatesInstanceWithParameters)
 
 TEST_F(ProcessingNodeTest, SetParameters)
 {
-    input_port<1>(processingNode).try_put(3);
-    input_port<1>(processingNode).try_put(5);
+    input_port<parametersInputPort>(processingNode).try_put(3);
+    input_port<parametersInputPort>(processingNode).try_put(5);
 
     graph.wait_for_all();
 
@@ -73,9 +75,9 @@ TEST_F(ProcessingNodeTest, SetParameters)
 
 TEST_F(ProcessingNodeTest, SetInput)
 {
-    input_port<1>(processingNode).try_put(3);
-    input_port<0>(processingNode).try_put(2.0);
-    input_port<0>(processingNode).try_put(4.0);
+    input_port<parametersInputPort>(processingNode).try_put(3);
+    input_port<flowInputPort>(processingNode).try_put(2.0);
+    input_port<flowInputPort>(processingNode).try_put(4.0);
 
     graph.wait_for_all();
 
@@ -86,8 +88,8 @@ TEST_F(ProcessingNodeTest, SetInput)
 
 TEST_F(ProcessingNodeTest, SetInputNoParameters)
 {
-    input_port<0>(processingNode).try_put(2.0);
-    input_port<0>(processingNode).try_put(4.0);
+    input_port<flowInputPort>(processingNode).try_put(2.0);
+    input_port<flowInputPort>(processingNode).try_put(4.0);
 
     graph.wait_for_all();
 
@@ -100,8 +102,10 @@ TEST_F(ProcessingNodeTest, SetInputNoParameters)
 
 TEST_F(ProcessingNodeTest, SetError)
 {
-    input_port<2>(processingNode).try_put(MAKE_ERROR("First error"));
-    input_port<2>(processingNode).try_put(MAKE_ERROR("Second error"));
+    input_port<errorInputPort>(processingNode)
+        .try_put(MAKE_ERROR("First error"));
+    input_port<errorInputPort>(processingNode)
+        .try_put(MAKE_ERROR("Second error"));
 
     graph.wait_for_all();
 
@@ -113,17 +117,19 @@ TEST_F(ProcessingNodeTest, SetError)
 
 TEST_F(ProcessingNodeTest, SetAll)
 {
-    input_port<0>(processingNode).try_put(2.0);
+    input_port<flowInputPort>(processingNode).try_put(2.0);
     graph.wait_for_all();
-    input_port<1>(processingNode).try_put(3);
-    input_port<0>(processingNode).try_put(4.0);
+    input_port<parametersInputPort>(processingNode).try_put(3);
+    input_port<flowInputPort>(processingNode).try_put(4.0);
     graph.wait_for_all();
-    input_port<1>(processingNode).try_put(5);
-    input_port<1>(processingNode).try_put(3);
-    input_port<0>(processingNode).try_put(2.0);
-    input_port<0>(processingNode).try_put(4.0);
-    input_port<2>(processingNode).try_put(MAKE_ERROR("First error"));
-    input_port<2>(processingNode).try_put(MAKE_ERROR("Second error"));
+    input_port<parametersInputPort>(processingNode).try_put(5);
+    input_port<parametersInputPort>(processingNode).try_put(3);
+    input_port<flowInputPort>(processingNode).try_put(2.0);
+    input_port<flowInputPort>(processingNode).try_put(4.0);
+    input_port<errorInputPort>(processingNode)
+        .try_put(MAKE_ERROR("First error"));
+    input_port<errorInputPort>(processingNode)
+        .try_put(MAKE_ERROR("Second error"));
 
     graph.wait_for_all();
 
