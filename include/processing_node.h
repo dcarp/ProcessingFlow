@@ -15,15 +15,15 @@ namespace ProcessingFlow
 #define BodyType typename
 
 enum InputPortIds {
-    flowInputPort,
-    parametersInputPort,
-    errorInputPort,
+    flowInputPort = 0,
+    errorInputPort = 1,
+    parametersInputPort = 2,
 };
 
 enum OutputPortIds {
-    flowOutputPort,
-    parametersOutputPort,
-    errorOutputPort,
+    flowOutputPort = 0,
+    errorOutputPort = 1,
+    parametersOutputPort = 2,
 };
 
 class TwoTrackNode
@@ -41,15 +41,15 @@ template <FlowDataType FlowData> class FlowSender
 template <FlowDataType Input, ParameterType Parameters,
           FlowDataType Output = Input>
 class ProcessingNode
-    : public tbb::flow::composite_node<std::tuple<Input, Parameters, Error>,
-                                       std::tuple<Output, Parameters, Error>>,
+    : public tbb::flow::composite_node<std::tuple<Input, Error, Parameters>,
+                                       std::tuple<Output, Error, Parameters>>,
       public TwoTrackNode,
       public FlowReceiver<Input>,
       public FlowSender<Output>
 {
     using Base
-        = tbb::flow::composite_node<std::tuple<Input, Parameters, Error>,
-                                    std::tuple<Output, Parameters, Error>>;
+        = tbb::flow::composite_node<std::tuple<Input, Error, Parameters>,
+                                    std::tuple<Output, Error, Parameters>>;
     using Multiplexer = tbb::flow::indexer_node<Input, Error>;
     enum {
         multiplexerInputPort = 0,
@@ -132,13 +132,14 @@ public:
 
         typename Base::input_ports_type input_tuple(
             tbb::flow::input_port<multiplexerInputPort>(multiplexer),
-            parameters,
-            tbb::flow::input_port<multiplexerErrorPort>(multiplexer));
+            tbb::flow::input_port<multiplexerErrorPort>(multiplexer),
+            parameters);
         typename Base::output_ports_type output_tuple(
             tbb::flow::output_port<processingFunctionOutputPort>(
                 processingFunction),
-            parameters, tbb::flow::output_port<processingFunctionErrorPort>(
-                            processingFunction));
+            tbb::flow::output_port<processingFunctionErrorPort>(
+                processingFunction),
+            parameters);
         Base::set_external_ports(input_tuple, output_tuple);
     }
 

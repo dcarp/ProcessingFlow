@@ -23,32 +23,32 @@ public:
           outputCollector(
               graph, serial,
               [this](const Output &output) { outputs.push_back(output); }),
+          errorCollector(graph, serial, [this](const Error &error) {
+              errors.push_back(error);
+          }),
           parametersCollector(graph, serial,
                               [this](const Parameters &parameters) {
                                   parameterSets.push_back(parameters);
-                              }),
-          errorCollector(graph, serial, [this](const Error &error) {
-              errors.push_back(error);
-          })
+                              })
     {
         make_edge(output_port<flowOutputPort>(processingNode), outputCollector);
+        make_edge(output_port<errorOutputPort>(processingNode), errorCollector);
         make_edge(output_port<parametersOutputPort>(processingNode),
                   parametersCollector);
-        make_edge(output_port<errorOutputPort>(processingNode), errorCollector);
     }
 
 protected:
     Outputs outputs;
-    ParameterSets parameterSets;
     Errors errors;
+    ParameterSets parameterSets;
 
     tbb::flow::graph graph;
     ProcessingNode<Input, Parameters> processingNode;
 
 private:
     function_node<Output> outputCollector;
-    function_node<Parameters> parametersCollector;
     function_node<Error> errorCollector;
+    function_node<Parameters> parametersCollector;
 };
 
 TEST_F(ProcessingNodeTest, CreatesInstanceWithParameters)
@@ -57,8 +57,8 @@ TEST_F(ProcessingNodeTest, CreatesInstanceWithParameters)
 
     EXPECT_EQ(processingNode.name(), "");
     EXPECT_EQ(Outputs(), outputs);
-    EXPECT_EQ(ParameterSets(), parameterSets);
     EXPECT_EQ(Errors(), errors);
+    EXPECT_EQ(ParameterSets(), parameterSets);
 }
 
 TEST_F(ProcessingNodeTest, SetParameters)
@@ -69,8 +69,8 @@ TEST_F(ProcessingNodeTest, SetParameters)
     graph.wait_for_all();
 
     EXPECT_EQ(Outputs(), outputs);
-    EXPECT_EQ(ParameterSets({3, 5}), parameterSets);
     EXPECT_EQ(Errors(), errors);
+    EXPECT_EQ(ParameterSets({3, 5}), parameterSets);
 }
 
 TEST_F(ProcessingNodeTest, SetInput)
@@ -82,8 +82,8 @@ TEST_F(ProcessingNodeTest, SetInput)
     graph.wait_for_all();
 
     EXPECT_EQ(Outputs({6.0, 12.0}), outputs);
-    EXPECT_EQ(ParameterSets({3}), parameterSets);
     EXPECT_EQ(Errors(), errors);
+    EXPECT_EQ(ParameterSets({3}), parameterSets);
 }
 
 TEST_F(ProcessingNodeTest, SetInputNoParameters)
@@ -94,10 +94,10 @@ TEST_F(ProcessingNodeTest, SetInputNoParameters)
     graph.wait_for_all();
 
     EXPECT_EQ(Outputs(), outputs);
-    EXPECT_EQ(ParameterSets(), parameterSets);
     EXPECT_EQ(Errors({MAKE_ERROR("No processing parameters"),
                       MAKE_ERROR("No processing parameters")}),
               errors);
+    EXPECT_EQ(ParameterSets(), parameterSets);
 }
 
 TEST_F(ProcessingNodeTest, SetError)
@@ -110,9 +110,9 @@ TEST_F(ProcessingNodeTest, SetError)
     graph.wait_for_all();
 
     EXPECT_EQ(Outputs(), outputs);
-    EXPECT_EQ(ParameterSets(), parameterSets);
     EXPECT_EQ(Errors({MAKE_ERROR("First error"), MAKE_ERROR("Second error")}),
               errors);
+    EXPECT_EQ(ParameterSets(), parameterSets);
 }
 
 TEST_F(ProcessingNodeTest, SetAll)
@@ -134,8 +134,8 @@ TEST_F(ProcessingNodeTest, SetAll)
     graph.wait_for_all();
 
     EXPECT_EQ(Outputs({12.0, 6.0, 12.0}), outputs);
-    EXPECT_EQ(ParameterSets({3, 5, 3}), parameterSets);
     EXPECT_EQ(Errors({MAKE_ERROR("No processing parameters"),
                       MAKE_ERROR("First error"), MAKE_ERROR("Second error")}),
               errors);
+    EXPECT_EQ(ParameterSets({3, 5, 3}), parameterSets);
 }
